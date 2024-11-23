@@ -6,7 +6,7 @@ const req = new XMLHttpRequest()
 // req.responseType = "json"
 // req.onload =() => console.log(req.response);
 
-const getFacts = new promise ((resolve, reject) =>{
+const getFacts = new Promise ((resolve, reject) =>{
     req.open("GET", "https://catfact.ninja/facts?limit=15&max_length=60")
     req.send()
     console.log(req.response);
