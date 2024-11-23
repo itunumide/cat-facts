@@ -1,4 +1,7 @@
-const req = new XMLHttpRequest()
+const catQuote = document.getElementById("cat-quote");
+const quoteButton = document.getElementById("new-quote-button");
+
+const req = new XMLHttpRequest();
 // req.open("GET", "https://catfact.ninja/facts")
 // req.send()
 // console.log(req.response);
@@ -6,19 +9,44 @@ const req = new XMLHttpRequest()
 // req.responseType = "json"
 // req.onload =() => console.log(req.response);
 
-const getFacts = new Promise ((resolve, reject) =>{
-    req.open("GET", "https://catfact.ninja/facts?limit=15&max_length=60")
-    req.send()
+const getFacts = () => {
+  return new Promise((resolve, reject) => {
+    req.open("GET", "https://catfact.ninja/facts?limit=35&max_length=100");
+
     console.log(req.response);
-    
-    req.responseType = "json"
-    req.onload = () => resolve (req.response);
-    req.onerror = () => reject (req.statusText);
-})
+    req.responseType = "json";
+    req.onload = () => {
+      if (req.status === 200) {
+        resolve(req.response);
+        
+      } else reject(`Error: ${req.statusText}`);
+    };
 
+    req.onerror = () => reject("Network Error");
+    req.send();
+  });
+};
+quoteButton.addEventListener("click", () => {
+    const randomQuote = Math.floor(Math.random()*35)
 
-getFacts
-.then(result => result.data
-)
-.then(result => console.log(result)
-).catch(error => console.log(error))
+    quoteButton.disabled = true;
+  quoteButton.textContent = "...Loading...";
+ 
+
+  getFacts()
+    .then((result) => {
+      catQuote.textContent = "";
+      
+      const fact = result.data[randomQuote];
+        catQuote.textContent = `"${fact.fact}"`;
+    })
+    .catch((error) => {
+    catQuote.textContent = `Failed to fetch facts. Error: ${error}`;
+    console.error("Error fetching facts: ", error);
+    })
+    .finally(() => {
+    quoteButton.disabled = false;
+    quoteButton.textContent = "Get new quote";
+    });
+
+});
